@@ -20,15 +20,40 @@ class Job implements Comparable<Job>{
 	
 	@Override
 	public String toString(){
-		return "[" + name + ": " + processingTime + " due="+deadline + "]";
+		return "[Job " + name + ":  Processing Time="+processingTime + ", due="+deadline + ",   (start="+start + ", finish="+finish + ")]";
 	}
 }
 
 public class MinimizeLateness {
 	public static void  findMinLateness(Job[] jobs){
-		System.out.println(Arrays.toString(jobs));
-		Arrays.sort(jobs);
-		System.out.println(Arrays.toString(jobs));
+		Arrays.sort(jobs);		//Sort by earliest deadline
+
+		int currentIntervalEndTime = 0;
+		for(Job job : jobs){
+			job.start = currentIntervalEndTime;
+			job.finish = currentIntervalEndTime + job.processingTime;
+			currentIntervalEndTime += job.processingTime;
+		}
+
+		//Loop over jobs to find any that are late and find the maximum lateness value
+		int maxLateness=0;
+		String maxLateJob = "";		//Initialize to empty string in case no job is late
+		for(Job job : jobs){
+			int lateness = job.finish - job.deadline;	//Calculate lateness. Negative means it's NOT late
+			if(lateness > maxLateness){
+				maxLateness = lateness;
+				maxLateJob = job.name;
+			}
+		}
+
+		System.out.print("Max Lateness = " + maxLateness);
+		if(!maxLateJob.equals("")){				//Only printed if a job was found. Skipped if no jobs are late
+			System.out.print("  From Job " + maxLateJob);
+		}
+		System.out.println("\nJob Assignment Order");
+		for(Job job : jobs){
+			System.out.println(job);
+		}
 	}
 	
 	
